@@ -1,5 +1,5 @@
 import unittest
-from utils_pytorch import batch_sqrtm
+from torch_utils import batch_sqrtm
 import numpy.testing as npt
 import numpy as np
 # import cupy as torch
