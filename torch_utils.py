@@ -18,13 +18,14 @@ def wishart(n_points, dim=2, p=5):
     return torch.matmul(X, torch.transpose(X, 2, 1))
 
 
-def batch_sqrtm(A, numIters = 20, reg = 2.0):
+def batch_sqrtm(A, numIters = 200, reg = 1.0):
     """
     Batch matrix root via Newton-Schulz iterations
     """
 
     batchSize = A.shape[0]
     dim = A.shape[1]
+    device = A.device
     #Renormalize so that the each matrix has a norm lesser than 1/reg, but only normalize when necessary
     normA = reg * torch.linalg.norm(A, dim=(1, 2))
     renorm_factor = torch.ones_like(normA)
@@ -32,8 +33,8 @@ def batch_sqrtm(A, numIters = 20, reg = 2.0):
     renorm_factor = renorm_factor.reshape(batchSize, 1, 1)
 
     Y = torch.divide(A, renorm_factor)
-    I = torch.eye(dim).reshape(1, dim, dim).repeat(batchSize, 1, 1)
-    Z = torch.eye(dim).reshape(1, dim, dim).repeat(batchSize, 1, 1)
+    I = torch.eye(dim).reshape(1, dim, dim).repeat(batchSize, 1, 1).to(device)
+    Z = torch.eye(dim).reshape(1, dim, dim).repeat(batchSize, 1, 1).to(device)
     for i in range(numIters):
         T = 0.5 * (3.0 * I - torch.matmul(Z, Y))
         Y = torch.matmul(Y, T)
